@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { remote } = require("webdriverio");
 const capabilities = {
   platformName: "Android",
@@ -34,21 +35,23 @@ async function runTest() {
     const cpfOuNumeroSmiles = await driver.$(
       '//*[@resource-id="com.pontomobi.smiles:id/login_input_member_number"]'
     );
-    // await cpfOuNumeroSmiles.click();
-    await cpfOuNumeroSmiles.setValue("123479086");
+    await cpfOuNumeroSmiles.setValue(process.env.LOGIN);
     const senha = await driver.$(
       '//*[@resource-id="com.pontomobi.smiles:id/login_input_password"]'
     );
-    // await senha.click();
-    await senha.setValue("1521");
+    await senha.setValue(process.env.SENHA);
     await entrar.click();
-    await driver.pause(30000);
-    const depois = await driver.$('//*[@text="Depois"]');
-    await depois.click();
-    // const maisTarde = await driver.$(
-    // '//*[@resource-id="com.pontomobi.smiles:id/buttonMoreLatterIncentive"]'
-    // );
-    // await maisTarde.click();
+    await driver.pause(15000);
+
+    try {
+      const OK = await driver.$('//*[@text="OK"]');
+      await OK.click();
+      await entrar.click();
+    } catch (error) {
+      const depois = await driver.$('//*[@text="Depois"]');
+      await depois.click();
+    }
+
     const vamosViajar = await driver.$('//*[@text="Vamos viajar, Jhonatan?"]');
     await vamosViajar.click();
     await driver.pause(15000);
@@ -79,22 +82,23 @@ async function runTest() {
     await aeroportoDestino.click();
     await driver.pause(10000);
 
-    const frameCalendar = await driver.$(
-      '//*[@resource-id="com.pontomobi.smiles:id/calendar"]'
+    var dataAtual = new Date();
+    dataAtual.setDate(dataAtual.getDate() + 10);
+
+    var dia = String(dataAtual.getDate()).padStart(2, "0");
+    var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
+    var ano = dataAtual.getFullYear();
+
+    var dataFormatada = dia + "/" + mes + "/" + ano;
+
+    console.log(dataFormatada);
+
+    const frameCalendar5 = await driver.$(
+      `(//android.view.ViewGroup[@content-desc="${dataFormatada}"])[2]`
     );
+    await frameCalendar5.click();
 
-    await frameCalendar.click();
-    const dataDoVoo = await driver.$('//*[@text="29"]');
-    await dataDoVoo.click();
-    await dataDoVoo.click();
-
-    // const frameContent = await driver.$(
-    //   '//*[@resource-id="android:id/content"]'
-    // );
-    // await driver.pause(10000);
-
-    // await frameContent.click();
-    // await driver.pause(10000);
+    await driver.pause(10000);
 
     const confirmar = await driver.$('//*[@text="CONFIRMAR"]');
     await driver.pause(10000);
@@ -105,44 +109,14 @@ async function runTest() {
     const buscarVoos = await driver.$('//*[@text="BUSCAR VOOS"]');
     await buscarVoos.click();
 
-    // await driver.pause(15000);
-    // const passagem = await driver.$('//*[@text="+ R$ 900,00"]');
-    // await passagem.click();
-    // 00000000-0000-01f2-ffff-ffff00000775
-    // ('//*[@resource-id="com.pontomobi.smiles:id/btn_continue"]')
+    await driver.pause(15000);
+    const passagem = await driver.$('//*[@text="1.000"]');
+    await passagem.click();
 
-    await driver.pause(10000);
-
-  
-
-    const continuarPassagem = await driver.$('//*[@text="CONTINUAR"]');
-    await continuarPassagem.click();
-    await driver.pause(10000);
-
-    const concordarComtermos = await driver.$(
-      '//*[@resource-id="com.pontomobi.smiles:id/check_box"]'
+    const clicaAleatorio = await driver.$(
+      '//*[@text="Sem milhas para a viagem?"]'
     );
-    await concordarComtermos.click();
-
-    const continuarCompra = await driver.$('//*[@text="CONTINUAR"]');
-    await continuarCompra.click();
-
-    const adulto1 = await driver.$(
-      '//*[@resource-id="com.pontomobi.smiles:id/arrow"]'
-    );
-    await continuarCompra.click();
-
-    const passageiro = await driver.$('//*[@text="Jhonatan K."]');
-    await passageiro.click();
-
-    const ddi = await driver.$('//*[@text="DDI"]');
-    await ddi.setValue("55");
-
-    const dddENumero = await driver.$('//*[@text="DDD X XXXX XXXX"]');
-    await dddENumero.setValue("47997194946");
-
-    const incluir = await driver.$('//*[@text="INCLUIR"]');
-    await incluir.click();
+    await clicaAleatorio.click();
   } finally {
     await driver.pause(10000);
     // await driver.deleteSession();
